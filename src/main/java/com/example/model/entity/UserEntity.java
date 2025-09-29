@@ -1,10 +1,16 @@
 package com.example.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+@Builder
 @Entity
 @Table(name = "users")
 @Data
@@ -34,9 +40,28 @@ public class UserEntity {
     private String addrPostal;
 
     @Column(name = "addr_country", length = 2)
-    private String addrCountry; // ISO 2-letter code
+    private String addrCountry;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<GroupMemberEntity> memberships = new HashSet<>();
+    // Expenses that this user has paid
+    @OneToMany(mappedBy = "paidBy", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<ExpenseEntity> paidExpenses = new ArrayList<>();
+
+    // Shares assigned to this user
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ExpenseShareEntity> expenseShares = new ArrayList<>();
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<SettlementEntity> settlementsPaid = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
+    private List<SettlementEntity> settlementsReceived = new ArrayList<>();
 
 }
