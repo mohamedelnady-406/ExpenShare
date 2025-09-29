@@ -1,7 +1,15 @@
 package com.example.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "expense_shares")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExpenseShareEntity {
 
     @Id
