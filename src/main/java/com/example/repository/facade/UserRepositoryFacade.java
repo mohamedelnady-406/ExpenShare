@@ -3,9 +3,10 @@ package com.example.repository.facade;
 import com.example.exception.NotFoundException;
 import com.example.model.entity.UserEntity;
 import com.example.repository.UserRepository;
-import io.micronaut.data.annotation.Repository;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Singleton
 @RequiredArgsConstructor
@@ -19,6 +20,9 @@ public class UserRepositoryFacade {
     }
     public UserEntity getOrThrow(Long id){
         return userRepository.findById(id).orElseThrow(NotFoundException::new);
+    }
+    public List<UserEntity> getAllMembersById(List<Long> members){
+        return  userRepository.findByIdIn(members);
     }
 
 }
