@@ -6,5 +6,5 @@ import io.micronaut.data.jpa.repository.JpaRepository;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity,Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 }

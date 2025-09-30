@@ -1,8 +1,10 @@
 package com.example.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.Set;
 @Entity
 @Table(name = "groups")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

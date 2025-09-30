@@ -3,7 +3,9 @@ package com.example.model.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,6 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
+@Setter
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,5 +66,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = false)
     @Builder.Default
     private List<SettlementEntity> settlementsReceived = new ArrayList<>();
-
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }
