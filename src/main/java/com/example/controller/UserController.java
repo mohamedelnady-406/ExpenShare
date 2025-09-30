@@ -7,6 +7,7 @@ import com.example.service.UserService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,12 @@ public class UserController {
     public HttpResponse<?> createUser(@Body @Valid CreateUserRequest userRequest){
         System.out.println(userRequest.toString());
         return HttpResponse.created(userService.createUser(userRequest));
+    }
+
+    @Get("/users/{id}")
+    public HttpResponse<?> getUser(Long id){
+        System.out.println("id= "+id);
+
+        return HttpResponse.ok(userService.getUserById(id));
     }
 }

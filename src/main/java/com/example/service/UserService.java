@@ -29,4 +29,9 @@ public class UserService {
         entity.setCreatedAt(LocalDateTime.now());
         return userMapper.toDto(entity);
     }
+    public UserDto getUserById(Long id){
+        UserEntity entity = userRepositoryFacade.getOrThrow(id);
+        return userMapper.toDto(entity);
+    }
+
 }

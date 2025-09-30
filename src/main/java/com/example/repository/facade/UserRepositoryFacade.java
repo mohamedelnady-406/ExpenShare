@@ -1,5 +1,6 @@
 package com.example.repository.facade;
 
+import com.example.exception.NotFoundException;
 import com.example.model.entity.UserEntity;
 import com.example.repository.UserRepository;
 import io.micronaut.data.annotation.Repository;
@@ -15,6 +16,9 @@ public class UserRepositoryFacade {
     }
     public boolean existsByEmail(String email){
         return userRepository.existsByEmail(email);
+    }
+    public UserEntity getOrThrow(Long id){
+        return userRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
 }

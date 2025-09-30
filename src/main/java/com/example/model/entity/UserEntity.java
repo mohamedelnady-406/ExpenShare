@@ -1,9 +1,7 @@
 package com.example.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -17,6 +15,8 @@ import java.util.Set;
 @Table(name = "users")
 @Data
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
