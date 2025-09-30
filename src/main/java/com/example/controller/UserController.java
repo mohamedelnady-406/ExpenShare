@@ -15,11 +15,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserMapper userMapper;
     @Post("/user")
     public HttpResponse<?> createUser(@Body @Valid CreateUserRequest userRequest){
         System.out.println(userRequest.toString());
-        UserEntity entity = userService.createUser(userRequest);
-        return HttpResponse.created(userMapper.toDto(entity));
+        return HttpResponse.created(userService.createUser(userRequest));
     }
 }

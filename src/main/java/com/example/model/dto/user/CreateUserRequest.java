@@ -25,7 +25,7 @@ public class CreateUserRequest {
     @Email(message = "Email must be valid")
     private String email;
 
-    @Pattern(regexp = "^\\+[1-9]\\d{1,14}$",
+    @Pattern(regexp = "^\\+20[1-9]\\d{9}$",
             message = "Mobile number must be in E.164 format (e.g. +201234567890)")
     private String mobileNumber;
 

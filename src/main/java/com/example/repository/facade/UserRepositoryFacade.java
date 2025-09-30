@@ -13,5 +13,8 @@ public class UserRepositoryFacade {
     public UserEntity create(UserEntity e){
         return userRepository.save(e);
     }
+    public boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
 
 }

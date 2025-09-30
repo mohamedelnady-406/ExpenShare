@@ -8,9 +8,10 @@ import com.example.model.entity.UserEntity;
 import jakarta.inject.Singleton;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 @Singleton
-@Mapper(componentModel = "jsr330")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,componentModel = "jsr330")
 public interface UserMapper {
 
     @Mapping(source = "address.line1", target = "addrLine1")
