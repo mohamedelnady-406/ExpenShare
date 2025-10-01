@@ -1,21 +1,20 @@
 package com.example.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "expenses")
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class ExpenseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +35,7 @@ public class ExpenseEntity {
     )
     private UserEntity paidBy;
     @Column(nullable = false, precision = 18, scale = 2)
-    private Long amount;
+    private BigDecimal amount;
 
     @Column(nullable = false, length = 255)
     private String description;

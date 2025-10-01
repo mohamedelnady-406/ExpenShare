@@ -47,7 +47,7 @@ public class GroupService {
         }
         savedGroup.setMembers(members);
 
-        // Save group again with members (cascade = ALL on GroupEntity.members handles it)
+        // Save group again with members (cascade set of members to their table)
         GroupEntity savedWithMembers = groupRepositoryFacade.save(savedGroup);
 
         List<Long> memberIds = savedWithMembers.getMembers().stream()

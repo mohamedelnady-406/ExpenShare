@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "users")
-@Data
+@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -69,5 +69,16 @@ public class UserEntity {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserEntity)) return false;
+        return id != null && id.equals(((UserEntity) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

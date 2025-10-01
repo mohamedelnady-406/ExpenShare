@@ -59,4 +59,11 @@ public class GroupRepositoryFacade {
 
         return addedIds;
     }
+    public boolean isMember(Long groupId, Long userId){
+        return groupMemberRepository.existsByGroupIdAndUserId(groupId,userId);
+    }
+
+    public List<Long> findUserIdsByGroupId(Long id) {
+        return groupMemberRepository.findUserIdByGroupId(id);
+    }
 }

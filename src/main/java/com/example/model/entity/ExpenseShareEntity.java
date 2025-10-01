@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "expense_shares")
 @Data
@@ -25,5 +27,5 @@ public class ExpenseShareEntity {
     private UserEntity user;
 
     @Column(name = "share_amount", nullable = false, precision = 18, scale = 2)
-    private Long shareAmount;
+    private BigDecimal shareAmount;
 }
