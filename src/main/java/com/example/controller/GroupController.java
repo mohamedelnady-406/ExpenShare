@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import com.example.model.dto.group.AddMembersRequest;
+import com.example.model.dto.group.AddMembersResponse;
 import com.example.model.dto.group.CreateGroupRequest;
 import com.example.model.dto.group.GroupDto;
 import com.example.service.GroupService;
@@ -14,18 +16,24 @@ import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 
-@Controller("/api")
+@Controller("/api/groups")
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
-    @Post("/groups")
+    @Post
     public HttpResponse<GroupDto> createGroup(@Body @Valid CreateGroupRequest req) {
         GroupDto dto = groupService.createGroup(req);
         return HttpResponse.created(dto);
     }
-//    @Get("/groups/{groupId}")
-//    public HttpResponse<GroupDto> getGroup(Long id){
-//        GroupDto dto = groupService.getGroup(id);
-//        return HttpResponse.ok(dto);
-//    }
+    @Get("/{groupId}")
+    public HttpResponse<GroupDto> getGroup(Long groupId){
+        GroupDto dto = groupService.getGroup(groupId);
+        return HttpResponse.ok(dto);
+    }
+    @Post("/{groupId}/members")
+    public HttpResponse<AddMembersResponse> addMembers(Long groupId,
+                                                       @Body @Valid AddMembersRequest request) {
+        AddMembersResponse response = groupService.addMembers(groupId, request.getMembers());
+        return HttpResponse.ok(response);
+    }
 }

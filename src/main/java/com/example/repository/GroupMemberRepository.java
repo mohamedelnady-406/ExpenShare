@@ -6,4 +6,5 @@ import io.micronaut.data.jpa.repository.JpaRepository;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMemberEntity,Long> {
+    boolean existsByGroupIdAndUserId(Long groupId, Long userId);
 }
