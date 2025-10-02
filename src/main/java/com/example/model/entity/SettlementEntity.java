@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,11 +34,11 @@ public class SettlementEntity {
     private UserEntity toUser;
 
     @Column(nullable = false, precision = 18, scale = 2)
-    private Long amount;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Method method = Method.OTHER;
+    private Method method;
 
     @Column(length = 255)
     private String note;
