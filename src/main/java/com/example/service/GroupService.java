@@ -1,12 +1,12 @@
 package com.example.service;
 
 import com.example.exception.NotFoundException;
+import com.example.model.dto.expense.ShareDto;
 import com.example.model.dto.group.AddMembersResponse;
 import com.example.model.dto.group.CreateGroupRequest;
+import com.example.model.dto.group.GroupBalanceResponse;
 import com.example.model.dto.group.GroupDto;
-import com.example.model.entity.GroupEntity;
-import com.example.model.entity.GroupMemberEntity;
-import com.example.model.entity.UserEntity;
+import com.example.model.entity.*;
 import com.example.model.mapper.GroupMapper;
 import com.example.repository.facade.GroupRepositoryFacade;
 import com.example.repository.facade.UserRepositoryFacade;
@@ -16,11 +16,11 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 
 import javax.swing.*;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 @RequiredArgsConstructor
@@ -79,5 +79,30 @@ public class GroupService {
         int totalMembers = group.getMembers().size();
 
         return new AddMembersResponse(groupId, added, totalMembers);
+    }
+
+    @Transactional
+    public GroupBalanceResponse getGroupBalances(Long groupId, Instant snapshot) {
+        GroupEntity group = groupRepositoryFacade.getGroupOrThrow(groupId);
+        Instant effectiveSnapshot = (snapshot != null) ? snapshot : Instant.now();
+        Map<Long, BigDecimal> balances = new HashMap<>();
+
+        for (ExpenseEntity expense : group.getExpenses()) {
+            /*if (expense.getCreatedAt().toInstant(java.time.ZoneOffset.UTC).isAfter(effectiveSnapshot)) {
+                continue; // skip future expenses
+            }*/
+            for (ExpenseShareEntity share : expense.getShares()) {
+                balances.merge(
+                        share.getUser().getId(),
+                        share.getShareAmount(),
+                        BigDecimal::add
+                );
+            }
+        }
+        List<ShareDto> balanceDtos = balances.entrySet().stream()
+                .map(e -> new ShareDto(e.getKey(), e.getValue()))
+                .toList();
+        return new GroupBalanceResponse(group.getId(), balanceDtos, effectiveSnapshot);
+
     }
 }

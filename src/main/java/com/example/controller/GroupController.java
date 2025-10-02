@@ -1,20 +1,16 @@
 package com.example.controller;
 
-import com.example.model.dto.group.AddMembersRequest;
-import com.example.model.dto.group.AddMembersResponse;
-import com.example.model.dto.group.CreateGroupRequest;
-import com.example.model.dto.group.GroupDto;
+import com.example.model.dto.group.*;
 import com.example.service.GroupService;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import jakarta.validation.GroupSequence;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
+import java.time.Instant;
+import java.util.Optional;
 
 @Controller("/api/groups")
 @RequiredArgsConstructor
@@ -35,5 +31,11 @@ public class GroupController {
                                                        @Body @Valid AddMembersRequest request) {
         AddMembersResponse response = groupService.addMembers(groupId, request.getMembers());
         return HttpResponse.ok(response);
+    }
+    @Get("/{groupId}/balances")
+    public GroupBalanceResponse getGroupBalances(Long groupId,
+                                                 @QueryValue Optional<Instant> at) {
+        Instant snapshot = at.orElse(Instant.now());
+        return groupService.getGroupBalances(groupId, snapshot);
     }
 }
