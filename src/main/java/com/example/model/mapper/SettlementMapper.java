@@ -2,6 +2,7 @@ package com.example.model.mapper;
 
 import com.example.model.dto.settlement.CreateSettlementRequest;
 import com.example.model.dto.settlement.SettlementDto;
+import com.example.model.dto.settlement.SettlementItem;
 import com.example.model.entity.SettlementEntity;
 import jakarta.inject.Singleton;
 import org.mapstruct.Mapper;
@@ -24,5 +25,10 @@ public interface SettlementMapper {
     @Mapping(target = "toUserId", source = "toUser.id")
     @Mapping(target = "createdAt", expression = "java(e.getCreatedAt().atZone(java.time.ZoneOffset.UTC).toInstant())")
     SettlementDto toDto(SettlementEntity e);
+
+    @Mapping(target = "settlementId", source = "id")
+    @Mapping(target = "fromUserId", source = "fromUser.id")
+    @Mapping(target = "toUserId", source = "toUser.id")
+    SettlementItem toItem(SettlementEntity e);
 
 }

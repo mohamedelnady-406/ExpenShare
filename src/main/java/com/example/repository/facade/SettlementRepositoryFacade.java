@@ -1,10 +1,12 @@
 package com.example.repository.facade;
 
 import com.example.exception.NotFoundException;
-import com.example.model.dto.settlement.SettlementDto;
 import com.example.model.entity.SettlementEntity;
+import com.example.model.entity.Status;
 import com.example.repository.SettlementRepository;
 
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import jakarta.inject.Singleton;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,10 @@ public class SettlementRepositoryFacade {
     }
     public SettlementEntity updateSettlment(SettlementEntity e){
         return settlementRepository.update(e);
+    }
+
+    public Page<SettlementEntity> findSettlementByFilters(Long groupId, Status status, Long aLong, Long aLong1, Pageable pageable) {
+        return settlementRepository.findByFilters(groupId,status,aLong,aLong1,pageable);
     }
 }
 

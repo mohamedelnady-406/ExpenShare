@@ -6,13 +6,18 @@ import com.example.model.dto.group.AddMembersResponse;
 import com.example.model.dto.group.CreateGroupRequest;
 import com.example.model.dto.group.GroupBalanceResponse;
 import com.example.model.dto.group.GroupDto;
+import com.example.model.dto.settlement.GroupSettlementPageResponse;
+import com.example.model.dto.settlement.SettlementItem;
 import com.example.model.entity.*;
 import com.example.model.mapper.GroupMapper;
+import com.example.model.mapper.SettlementMapper;
 import com.example.repository.facade.GroupRepositoryFacade;
+import com.example.repository.facade.SettlementRepositoryFacade;
 import com.example.repository.facade.UserRepositoryFacade;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 
 import javax.swing.*;
@@ -28,6 +33,8 @@ public class GroupService {
     private final GroupRepositoryFacade groupRepositoryFacade;
     private final UserRepositoryFacade userRepositoryFacade;
     private final GroupMapper groupMapper;
+    private final SettlementRepositoryFacade settlementRepositoryFacade;
+    private final SettlementMapper settlementMapper;
     @Transactional
     public GroupDto createGroup(CreateGroupRequest request){
         if (!groupRepositoryFacade.usersExist(request.getMembers())) {
@@ -105,4 +112,37 @@ public class GroupService {
         return new GroupBalanceResponse(group.getId(), balanceDtos, effectiveSnapshot);
 
     }
+
+    @Transactional
+    public GroupSettlementPageResponse listGroupSettlements(
+            Long groupId,
+            Optional<Status> status,
+            Optional<Long> fromUserId,
+            Optional<Long> toUserId,
+            int page,
+            int size
+    ) {
+        Pageable pageable = Pageable.from(page, Math.min(size, 100));
+
+        Page<SettlementEntity> results = settlementRepositoryFacade.findSettlementByFilters(
+                groupId,
+                status.orElse(null),
+                fromUserId.orElse(null),
+                toUserId.orElse(null),
+                pageable
+        );
+
+        List<SettlementItem> items = results.getContent()
+                .stream()
+                .map(settlementMapper::toItem)
+                .toList();
+        return GroupSettlementPageResponse.builder()
+                .groupId(groupId)
+                .items(items)
+                .page(page)
+                .size(size)
+                .total((int) results.getTotalSize())
+                .build();
+    }
+
 }

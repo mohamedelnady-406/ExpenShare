@@ -1,10 +1,11 @@
 package com.example.controller;
 
 import com.example.model.dto.group.*;
+import com.example.model.dto.settlement.GroupSettlementPageResponse;
 import com.example.service.GroupService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
-import jakarta.validation.GroupSequence;
+import com.example.model.entity.Status;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -37,5 +38,18 @@ public class GroupController {
                                                  @QueryValue Optional<Instant> at) {
         Instant snapshot = at.orElse(Instant.now());
         return groupService.getGroupBalances(groupId, snapshot);
+    }
+    @Get("/{groupId}/settlements")
+    public HttpResponse<GroupSettlementPageResponse> listGroupSettlements(
+            @PathVariable Long groupId,
+            @QueryValue(defaultValue = "") Optional<Status> status,
+            @QueryValue(defaultValue = "") Optional<Long> fromUserId,
+            @QueryValue(defaultValue = "") Optional<Long> toUserId,
+            @QueryValue(defaultValue = "0") int page,
+            @QueryValue(defaultValue = "20") int size
+    ) {
+        return HttpResponse.ok(
+                groupService.listGroupSettlements(groupId, status, fromUserId, toUserId, page, size)
+        );
     }
 }
