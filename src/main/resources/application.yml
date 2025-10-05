@@ -21,7 +21,9 @@ jpa:
           auto: update
     entity-scan:
       packages: com.example.model.entity
-
+kafka:
+  bootstrap:
+    servers: localhost:29092
 logger:
   levels:
     ROOT: INFO

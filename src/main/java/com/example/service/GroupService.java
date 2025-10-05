@@ -8,12 +8,16 @@ import com.example.model.dto.group.GroupBalanceResponse;
 import com.example.model.dto.group.GroupDto;
 import com.example.model.dto.settlement.GroupSettlementPageResponse;
 import com.example.model.dto.settlement.SettlementItem;
+import com.example.model.dto.settlement.SettlementSuggestion;
+import com.example.model.dto.settlement.SuggestionResponse;
 import com.example.model.entity.*;
 import com.example.model.mapper.GroupMapper;
 import com.example.model.mapper.SettlementMapper;
 import com.example.repository.facade.GroupRepositoryFacade;
 import com.example.repository.facade.SettlementRepositoryFacade;
 import com.example.repository.facade.UserRepositoryFacade;
+import com.example.strategy.SettlementStrategy;
+import com.example.strategy.SettlementStrategyFactory;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import jakarta.inject.Singleton;
@@ -35,6 +39,7 @@ public class GroupService {
     private final GroupMapper groupMapper;
     private final SettlementRepositoryFacade settlementRepositoryFacade;
     private final SettlementMapper settlementMapper;
+    private final SettlementStrategyFactory strategyFactory;
     @Transactional
     public GroupDto createGroup(CreateGroupRequest request){
         if (!groupRepositoryFacade.usersExist(request.getMembers())) {
@@ -92,20 +97,7 @@ public class GroupService {
     public GroupBalanceResponse getGroupBalances(Long groupId, Instant snapshot) {
         GroupEntity group = groupRepositoryFacade.getGroupOrThrow(groupId);
         Instant effectiveSnapshot = (snapshot != null) ? snapshot : Instant.now();
-        Map<Long, BigDecimal> balances = new HashMap<>();
-
-        for (ExpenseEntity expense : group.getExpenses()) {
-            /*if (expense.getCreatedAt().toInstant(java.time.ZoneOffset.UTC).isAfter(effectiveSnapshot)) {
-                continue; // skip future expenses
-            }*/
-            for (ExpenseShareEntity share : expense.getShares()) {
-                balances.merge(
-                        share.getUser().getId(),
-                        share.getShareAmount(),
-                        BigDecimal::add
-                );
-            }
-        }
+        Map<Long, BigDecimal> balances = getBalancesByGroupId(groupId);
         List<ShareDto> balanceDtos = balances.entrySet().stream()
                 .map(e -> new ShareDto(e.getKey(), e.getValue()))
                 .toList();
@@ -144,5 +136,31 @@ public class GroupService {
                 .total((int) results.getTotalSize())
                 .build();
     }
+    @Transactional
+    public SuggestionResponse suggest(Long groupId, SettlementStrategyType type, BigDecimal roundTo){
+        GroupEntity group = groupRepositoryFacade.getGroupOrThrow(groupId);
+        Map<Long, BigDecimal> balances = getBalancesByGroupId(groupId);
+        SettlementStrategy strategy = strategyFactory.getStrategy(type);
+        List<UserBalance> userBalancesList = balances.entrySet().stream()
+                .map(
+                        e-> new UserBalance(e.getKey(),e.getValue()
+                        )).toList();
+        List<SettlementSuggestion> suggestions = strategy.suggestSettlements(userBalancesList, roundTo);
 
+        return new SuggestionResponse(groupId, suggestions, suggestions.size(), type);
+    }
+    private Map<Long,BigDecimal> getBalancesByGroupId(Long groupId) {
+        GroupEntity group = groupRepositoryFacade.getGroupOrThrow(groupId);
+        Map<Long, BigDecimal> balances = new HashMap<>();
+        for (ExpenseEntity expense : group.getExpenses()) {
+            for (ExpenseShareEntity share : expense.getShares()) {
+                balances.merge(
+                        share.getUser().getId(),
+                        share.getShareAmount(),
+                        BigDecimal::add
+                );
+            }
+        }
+        return balances;
+    }
 }

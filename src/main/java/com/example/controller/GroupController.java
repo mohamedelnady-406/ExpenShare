@@ -2,6 +2,9 @@ package com.example.controller;
 
 import com.example.model.dto.group.*;
 import com.example.model.dto.settlement.GroupSettlementPageResponse;
+import com.example.model.dto.settlement.SuggestionRequest;
+import com.example.model.dto.settlement.SuggestionResponse;
+import com.example.model.entity.SettlementStrategyType;
 import com.example.service.GroupService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
@@ -51,5 +54,17 @@ public class GroupController {
         return HttpResponse.ok(
                 groupService.listGroupSettlements(groupId, status, fromUserId, toUserId, page, size)
         );
+    }
+    @Post("/{groupId}/settlements/suggest")
+    public HttpResponse<SuggestionResponse> suggestSettlements(
+            Long groupId,
+            @Body SuggestionRequest request
+    ) {
+        var response = groupService.suggest(
+                groupId,
+                request.getStrategy() != null ? request.getStrategy() : SettlementStrategyType.GREEDY_MIN_TRANSFERS,
+                request.getRoundTo()
+        );
+        return HttpResponse.ok(response);
     }
 }
