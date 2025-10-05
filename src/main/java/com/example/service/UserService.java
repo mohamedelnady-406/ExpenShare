@@ -1,5 +1,7 @@
 package com.example.service;
 
+import com.example.event.KafkaProducer;
+import com.example.event.model.EventMessage;
 import com.example.exception.ConflictException;
 import com.example.exception.ValidationException;
 import com.example.model.dto.user.CreateUserRequest;
@@ -13,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepositoryFacade userRepositoryFacade;
     private final UserMapper userMapper;
+    private final KafkaProducer kafkaProducer;
 
     public UserDto createUser(CreateUserRequest userRequest){
 
@@ -27,6 +31,7 @@ public class UserService {
         }
         UserEntity entity = userRepositoryFacade.create(userMapper.toEntity(userRequest));
         entity.setCreatedAt(LocalDateTime.now());
+        kafkaProducer.publishUserCreated(EventMessage.of(Map.of("userId", entity.getId())));
         return userMapper.toDto(entity);
     }
     public UserDto getUserById(Long id){

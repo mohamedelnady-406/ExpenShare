@@ -3,8 +3,11 @@ package com.example.service;
 import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
+import com.example.event.KafkaProducer;
+import com.example.event.model.EventMessage;
 import com.example.exception.ConflictException;
 import com.example.exception.NotFoundException;
 import com.example.exception.ValidationException;
@@ -29,6 +32,7 @@ public class SettlementService {
     private final UserRepositoryFacade       userRepositoryFacade;
     private final SettlementMapper           settlementMapper;
     private final SettlementRepositoryFacade settlementRepositoryFacade;
+    private final KafkaProducer kafkaProducer;
 
     @Transactional
     public SettlementDto addSettlement(CreateSettlementRequest request) {
@@ -62,6 +66,11 @@ public class SettlementService {
         settlement.setToUser(toUser);
 
         SettlementEntity saved = settlementRepositoryFacade.saveSettlement(settlement);
+        if(saved.getStatus() == Status.CONFIRMED){
+            kafkaProducer.publishSettlementConfirmed(EventMessage.of(Map.of("settlementId",saved.getId(),
+                    "groupId",saved.getGroup().getId(),"fromUserId",saved.getFromUser().getId(),
+                    "toUserId",saved.getToUser().getId(),"amount",saved.getAmount())));
+        }
 
         return settlementMapper.toDto(saved);
     }
@@ -77,6 +86,9 @@ public class SettlementService {
         entity.setStatus(Status.CONFIRMED);
         entity.setConfirmedAt(LocalDateTime.now());
         settlementRepositoryFacade.updateSettlment(entity);
+        kafkaProducer.publishSettlementConfirmed(EventMessage.of(Map.of("settlementId",entity.getId(),
+                "groupId",entity.getGroup().getId(),"fromUserId",entity.getFromUser().getId(),
+        "toUserId",entity.getToUser().getId(),"amount",entity.getAmount())));
 
         return settlementMapper.toDto(entity);
     }

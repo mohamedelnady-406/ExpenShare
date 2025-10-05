@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import com.example.event.KafkaProducer;
+import com.example.event.model.EventMessage;
 import com.example.model.dto.group.*;
 import com.example.model.dto.settlement.GroupSettlementPageResponse;
 import com.example.model.dto.settlement.SuggestionRequest;
@@ -14,15 +16,18 @@ import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller("/api/groups")
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
+    private final KafkaProducer kafkaProducer;
     @Post
     public HttpResponse<GroupDto> createGroup(@Body @Valid CreateGroupRequest req) {
         GroupDto dto = groupService.createGroup(req);
+        kafkaProducer.publishGroupCreated(EventMessage.of(Map.of("groupId", dto.getGroupId())));
         return HttpResponse.created(dto);
     }
     @Get("/{groupId}")

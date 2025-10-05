@@ -1,5 +1,7 @@
 package com.example.service;
 
+import com.example.event.KafkaProducer;
+import com.example.event.model.EventMessage;
 import com.example.exception.ValidationException;
 import com.example.model.dto.expense.CreateExpenseRequest;
 import com.example.model.dto.expense.ExpenseDto;
@@ -15,6 +17,7 @@ import com.example.repository.facade.ExpenseRepositoryFacade;
 import com.example.repository.facade.GroupRepositoryFacade;
 import com.example.repository.facade.UserRepositoryFacade;
 import jakarta.inject.Singleton;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -22,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 @RequiredArgsConstructor
@@ -30,6 +34,8 @@ public class ExpenseService {
     private final GroupRepositoryFacade groupRepositoryFacade;
     private final UserRepositoryFacade userRepositoryFacade;
     private final ExpenseMapper expenseMapper;
+    private final KafkaProducer kafkaProducer;
+    @Transactional
     public ExpenseDto addExpense(CreateExpenseRequest req){
         GroupEntity group = groupRepositoryFacade.getGroupOrThrow(req.getGroupId());
         UserEntity paidBy = userRepositoryFacade.getOrThrow(req.getPaidBy());
@@ -46,6 +52,14 @@ public class ExpenseService {
         List<ShareDto> shareDtos = shares.stream()
                 .map(s -> new ShareDto(s.getUser().getId(), s.getShareAmount()))
                 .toList();
+        kafkaProducer.publishExpenseAdded(EventMessage.of(Map.of(
+                "expenseId", saved.getId(),
+                "groupId", saved.getGroup().getId(),
+                "paidBy", saved.getPaidBy().getId(),
+                "amount", saved.getAmount(),
+                "description", saved.getDescription()
+        )));
+
 
         return expenseMapper.toDto(saved, shareDtos);
 
