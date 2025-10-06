@@ -149,6 +149,9 @@ public class GroupService {
 
         return new SuggestionResponse(groupId, suggestions, suggestions.size(), type);
     }
+    public List<GroupEntity> getAllGroups(){
+        return groupRepositoryFacade.getAll();
+    }
     private Map<Long,BigDecimal> getBalancesByGroupId(Long groupId) {
         GroupEntity group = groupRepositoryFacade.getGroupOrThrow(groupId);
         Map<Long, BigDecimal> balances = new HashMap<>();

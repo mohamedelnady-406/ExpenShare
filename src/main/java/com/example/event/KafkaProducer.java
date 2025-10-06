@@ -14,6 +14,8 @@ public interface KafkaProducer {
     void publishExpenseAdded(EventMessage event);
     @Topic("settlement.confirmed")
     void publishSettlementConfirmed(EventMessage event);
+    @Topic("balance.reminder")
+    void publishBalanceReminder(EventMessage event);
 
 
 

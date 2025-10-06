@@ -29,6 +29,10 @@ public class KafkaConsumers {
     public void consumeConfirmedSettlement(String msg){
         log.info("A settlement have been confirmed: {}", msg);
     }
+   @Topic("balance.reminder")
+    public void consumeBalanceReminder(String msg){
+       log.info("A balance reminder: {}", msg);
+    }
 }
 
 

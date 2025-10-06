@@ -66,4 +66,8 @@ public class GroupRepositoryFacade {
     public List<Long> findUserIdsByGroupId(Long id) {
         return groupMemberRepository.findUserIdByGroupId(id);
     }
+
+    public List<GroupEntity> getAll() {
+        return groupRepository.findAll();
+    }
 }
